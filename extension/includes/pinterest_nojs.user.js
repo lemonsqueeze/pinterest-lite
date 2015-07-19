@@ -40,12 +40,16 @@ function removeall(l)
 
 function layout()
 {
+    var columns = Math.floor(window.innerWidth / (236 + 14));
+    console.warn('columns: ' + columns);
+    if (columns == document.body.columns_items)  // unchanged
+	return;
+    document.body.columns_items = columns;
+
     // remove previous clearfloat divs in case of resize
     removeall(document.querySelectorAll('.GridItems.variableHeightLayout > .clearfloats'));
 
     var items = document.querySelectorAll('.GridItems.variableHeightLayout > .item');    
-    var columns = Math.floor(window.innerWidth / (236 + 14));
-    console.warn('columns: ' + columns);
     var parent = items[0].parentNode;
     for (var i = 0; i < items.length; i++)
     {
@@ -64,8 +68,11 @@ function main()
                     { float:left; position:static; visibility:visible; } ");
     add_style(".GridItems.variableHeightLayout > .clearfloats \
                     { clear: both; } ");
+    add_style(".Pin.summary .pinImg  \
+                    { opacity: 1; } ");
 
     window.onresize = layout;
+    layout();
 }
 
 document.addEventListener('DOMContentLoaded',  main, false);

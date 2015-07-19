@@ -9,10 +9,6 @@
 // ==/UserScript==
 
 (function(document, location) {
-    function is_prefix(p, str)
-    {
-        return (str.slice(0, p.length) == p);
-    }
     
     function handle_noscript_tags()
     {
@@ -38,11 +34,25 @@
 	e.preventDefault();
     }    
 
+    // block pinterest onload handlers
+    function beforeonload_handler(ue)
+    {
+	var el = ue.event.srcElement;
+	if (el && el.tagName.toLowerCase() == 'img')
+	{
+//	    console.warn('onload: img');
+	    ue.preventDefault();
+	}
+    }
+
     // block inline scripts
     window.opera.addEventListener('BeforeScript',	  beforescript_handler, false);
     
     // block external scripts (won't even download)
     window.opera.addEventListener('BeforeExternalScript', beforeextscript_handler, false);
+
+    // block pinterest onload handlers
+    window.opera.addEventListener('BeforeEventListener.load', beforeonload_handler, false);
     
     // use this one if you want <noscript> tags interpreted as if javascript was disabled in opera.
     document.addEventListener('DOMContentLoaded',  handle_noscript_tags, false);
