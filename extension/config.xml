@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" version="1.2"
-	id="https://github.com/lemonsqueeze/pinterest_nojs">
-    <name>Pinterest NoJS</name>
-    <description>Browse Pinterest without the javascript bloat</description>
+	id="https://github.com/lemonsqueeze/pinterest_lite">
+    <name>Pinterest Lite</name>
+    <description>Browse Pinterest without login and the javascript bloat.</description>
     <author href="https://github.com/lemonsqueeze/pinterest_nojs">lemonsqueeze</author>
     <icon src="icon.png"/>
     <license href="http://www.gnu.org/licenses/gpl-2.0.html">
