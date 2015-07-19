@@ -38,6 +38,25 @@ function removeall(l)
 	l[i].parentNode.removeChild(l[i]);
 }
 
+function layout_items(columns, container_selector)
+{
+    var containers = document.querySelectorAll(container_selector);
+    for (var j = 0; j < containers.length; j++)
+    {
+	var container = containers[j];
+	var items = container.querySelectorAll('div.item');
+	for (var i = 0; i < items.length; i++)
+	{
+	    if (i % columns == 0)
+	    {
+		var div = document.createElement('div');
+		div.className = 'clearfloats';
+		container.insertBefore(div, items[i]);
+	    }
+	}   
+    }        
+}
+
 function layout()
 {
     var columns = Math.floor(window.innerWidth / (236 + 14));
@@ -47,19 +66,12 @@ function layout()
     document.body.columns_items = columns;
 
     // remove previous clearfloat divs in case of resize
-    removeall(document.querySelectorAll('.GridItems.variableHeightLayout > .clearfloats'));
+    removeall(document.querySelectorAll('div.clearfloats'));
 
-    var items = document.querySelectorAll('.GridItems.variableHeightLayout > .item');    
-    var parent = items[0].parentNode;
-    for (var i = 0; i < items.length; i++)
-    {
-	if (i % columns == 0)
-	{
-	    var div = document.createElement('div');
-	    div.className = 'clearfloats';
-	    parent.insertBefore(div, items[i]);
-	}
-    }
+    // board page
+    layout_items(columns, '.locationBoardPageContentWrapper .GridItems.variableHeightLayout');
+    // pin page
+    layout_items(columns, '.gridContainer .GridItems.variableHeightLayout');
 }
 
 function main()
