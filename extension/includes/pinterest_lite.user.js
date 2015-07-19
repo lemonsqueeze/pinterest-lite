@@ -78,18 +78,23 @@ function layout()
 	layout_items(columns, selectors[i]);
 }
 
-function main()
+function add_styles()
 {
     add_style(".GridItems.variableHeightLayout > .item \
                     { float:left; position:static; visibility:visible; } ");
     add_style(".GridItems.variableHeightLayout > .clearfloats \
                     { clear: both; } ");
     add_style(".Pin.summary .pinImg  \
-                    { opacity: 1; } ");
+                    { opacity: 1; } ");		// make board images visible
+    add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
+                    { opacity: 1; } ");		// remove pin icons greyout
+}
 
+function main()
+{
     window.onresize = layout;
     layout();
 }
 
+on_document_ready(add_styles);
 document.addEventListener('DOMContentLoaded',  main, false);
-//on_document_ready(main);
