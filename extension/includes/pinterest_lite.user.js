@@ -68,10 +68,14 @@ function layout()
     // remove previous clearfloat divs in case of resize
     removeall(document.querySelectorAll('div.clearfloats'));
 
-    // board page
-    layout_items(columns, '.locationBoardPageContentWrapper .GridItems.variableHeightLayout');
-    // pin page
-    layout_items(columns, '.gridContainer .GridItems.variableHeightLayout');
+    var selectors = [    
+	'.locationBoardPageContentWrapper .GridItems.variableHeightLayout',	// board page   
+	'.gridContainer .GridItems.variableHeightLayout',			// pin page
+	'.DomainFeedPage .GridItems.variableHeightLayout'			// source page
+    ];
+
+    for (var i = 0; i < selectors.length; i++)
+	layout_items(columns, selectors[i]);
 }
 
 function main()
