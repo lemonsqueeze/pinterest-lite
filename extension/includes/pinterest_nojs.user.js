@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name        Pinterest no js
-// @namespace   http://lemonsqueeze.com/pinterest_no_js
+// @name        Pinterest No JS
+// @namespace   https://github.com/lemonsqueeze/pinterest_nojs
 // @version     1.0
-// @description Allows to browse Pinterest without js
-// @include     http://*.pinterest.com/*
-// @include     https://*.pinterest.com/*
+// @description Browse Pinterest without all the javascript bloat
+// @include     http://www.pinterest.com/*
+// @include     https://www.pinterest.com/*
 // @copyright   2015, lemonsqueeze
 // @license     GPL version 3 or any later version; http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
@@ -20,6 +20,53 @@ function add_style(css)
     }
 }
 
-add_style(".GridItems.variableHeightLayout > .item { float:left; position:static; visibility:visible; }");
+function on_document_ready(f)
+{
+    function check_ready()
+    {
+        if (document.body)
+            f();
+        else
+            setTimeout(check_ready, 50);
+    }
+    setTimeout(check_ready, 50);
+}
 
+function removeall(l)
+{
+    for (var i = l.length - 1; i >= 0; i--)
+	l[i].parentNode.removeChild(l[i]);
+}
 
+function layout()
+{
+    // remove previous clearfloat divs in case of resize
+    removeall(document.querySelectorAll('.GridItems.variableHeightLayout > .clearfloats'));
+
+    var items = document.querySelectorAll('.GridItems.variableHeightLayout > .item');    
+    var columns = Math.floor(window.innerWidth / (236 + 14));
+    console.warn('columns: ' + columns);
+    var parent = items[0].parentNode;
+    for (var i = 0; i < items.length; i++)
+    {
+	if (i % columns == 0)
+	{
+	    var div = document.createElement('div');
+	    div.className = 'clearfloats';
+	    parent.insertBefore(div, items[i]);
+	}
+    }
+}
+
+function main()
+{
+    add_style(".GridItems.variableHeightLayout > .item \
+                    { float:left; position:static; visibility:visible; } ");
+    add_style(".GridItems.variableHeightLayout > .clearfloats \
+                    { clear: both; } ");
+
+    window.onresize = layout;
+}
+
+document.addEventListener('DOMContentLoaded',  main, false);
+//on_document_ready(main);

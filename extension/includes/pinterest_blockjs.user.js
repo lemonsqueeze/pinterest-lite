@@ -4,7 +4,8 @@
 // @version 1.0
 // @description Disable javascript on pinterest
 // @published 2015-07-19 11:00
-// @include        http*://www.pinterest.com/*
+// @include        http://www.pinterest.com/*
+// @include        https://www.pinterest.com/*
 // ==/UserScript==
 
 (function(document, location) {
