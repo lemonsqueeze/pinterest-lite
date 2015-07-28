@@ -15,11 +15,57 @@
 if (window != window.top)   // in iframe
     return;
 
+var page_type = "board";
+
+if (is_prefix("/pin/", window.location.pathname))
+    page_type = "pin";
+if (is_prefix("/source/", window.location.pathname))
+    page_type = "source";
+
 
 /********************************************************************************/
 
 var board_url = window.location.pathname;
 var xhr_req_data = null;
+
+/* Pin page requests */
+
+function make_relatedpinfeedresource_url(data)
+{
+    var s = JSON.stringify(data);
+    s = encodeURI(s);
+    s = s.replace(/:/g, '%3A');
+    s = s.replace(/,/g, '%2C');
+    s = s.replace(/\//g, '%2F');
+    s = s.replace(/=/g, '%3D');
+
+    var url = ("https://www.pinterest.com/resource/RelatedPinFeedResource/get/" +
+	       "?source_url=" + board_url.replace(/\//g, '%2F') +
+	       "&data=" + s +
+	       "&_=" + new Date().getTime());
+    return url;
+}
+
+
+function first_relatedpinfeedresource_url()
+{
+    var script = document.querySelector('script#jsInit');
+    var m = script.innerText.match(/"RelatedPinFeedResource", ([^}]*}[^}]*})/);
+    if (!m)
+	return null;
+    xhr_req_data = JSON.parse('{' + m[1] + '}');    
+    xhr_req_data.context = {};
+    return make_relatedpinfeedresource_url(xhr_req_data);
+}
+
+function get_relatedpinfeedresource_url(o)
+{
+    if (!o)
+	return first_relatedpinfeedresource_url();
+    return null;
+}
+
+/* Board page requests */
 
 function make_boardfeedresource_url(data)
 {
@@ -60,6 +106,16 @@ function get_boardfeedresource_url(o)
     return make_boardfeedresource_url(xhr_req_data);
 }
 
+function get_xhr_url(o)
+{
+    console.log('page type: ' + page_type);
+    if (page_type == 'board')
+	return get_boardfeedresource_url(o);
+    if (page_type == 'pin')
+	return get_relatedpinfeedresource_url(o);
+    return null;
+}
+
 /********************************************************************************/
 
 var autoload = {};
@@ -67,9 +123,9 @@ var xhr_url = null;
 
 function autoload_init(o)
 {
-    xhr_url = get_boardfeedresource_url(o);
+    xhr_url = get_xhr_url(o);
     if (!xhr_url)
-	return;
+	return;    
     
     // TODO spinner ?
     watch_for_scroll();
@@ -78,6 +134,7 @@ function autoload_init(o)
 function request_more_results()
 {    
     console.log("getting more items ...");
+    console.log(xhr_url);
     getURL(xhr_url, process_autoload_results, autoload_error);
 }
 
@@ -252,9 +309,40 @@ function new_item(item)
 
 function process_autoload_results(res)
 {
+    if (page_type == 'board')
+	process_board_feed_results(res);
+    if (page_type == 'pin')
+	process_related_pin_feed_results(res);
+}
+
+function process_related_pin_feed_results(res)
+{
     // console.log("xhr worked !");
     
     var o = JSON.parse(res);
+    // window.obj_response = o; // FIXME debugging
+    var fragment = document.createDocumentFragment();
+    for (var i in o.resource_response.data)
+    {
+	var item = o.resource_response.data[i];
+	fragment.appendChild(new_item(item));  // FIXME template for pin items is different !
+    }
+    var parent = document.querySelector('.relatedPinsWrapper .GridItems.variableHeightLayout'); // board page
+    parent.appendChild(fragment);
+
+    document.body.columns_items = 0; // force
+    layout();
+
+    autoload.requestingMoreResults = false;
+    autoload_init(o);
+}
+
+function process_board_feed_results(res)
+{
+    // console.log("xhr worked !");
+    
+    var o = JSON.parse(res);
+    // window.obj_response = o; // FIXME debugging
     var fragment = document.createDocumentFragment();
     for (var i in o.resource_response.data)
     {
@@ -278,6 +366,11 @@ function autoload_error()
 
 
 /********************************************************************************/
+
+function is_prefix(p, str)
+{
+    return (str.slice(0, p.length) == p);
+}
 
 function add_style(css)
 {
@@ -357,6 +450,7 @@ function layout()
 
 function add_styles()
 {
+    // FIXME pin pages: user images in related pins are screwed up...
     add_style(".Pin.summary .pinImg  \
                     { opacity: 1; } ");                // make board images visible
     add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
