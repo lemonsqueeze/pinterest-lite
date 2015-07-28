@@ -9,24 +9,21 @@
 // @license     GPL version 3 or any later version; http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
 
-/********************************************************************************/
 
 (function(){
 
 if (window != window.top)   // in iframe
     return;
 
-var board_url = window.location.pathname;
 
-function get_xhr_url()
+/********************************************************************************/
+
+var board_url = window.location.pathname;
+var xhr_req_data = null;
+
+function make_boardfeedresource_url(data)
 {
-    var script = document.querySelector('script#jsInit');
-    var m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);
-    if (!m)
-	return null;
-    var data = JSON.parse('{' + m[1] + '}');    
-    data.context = {};
-    s = JSON.stringify(data);
+    var s = JSON.stringify(data);
     s = encodeURI(s);
     s = s.replace(/:/g, '%3A');
     s = s.replace(/,/g, '%2C');
@@ -40,14 +37,37 @@ function get_xhr_url()
     return url;
 }
 
+function first_boardfeedresource_url()
+{
+    var script = document.querySelector('script#jsInit');
+    var m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);
+    if (!m)
+	return null;
+    xhr_req_data = JSON.parse('{' + m[1] + '}');    
+    xhr_req_data.context = {};
+    return make_boardfeedresource_url(xhr_req_data);
+}
+
+function get_boardfeedresource_url(o)
+{
+    if (!o)
+	return first_boardfeedresource_url();
+
+    var bookmark = o.resource.options.bookmarks[0];
+    if (bookmark == "-end-")
+	return null;
+    xhr_req_data.options.bookmarks[0] = bookmark;
+    return make_boardfeedresource_url(xhr_req_data);
+}
+
 /********************************************************************************/
 
 var autoload = {};
 var xhr_url = null;
 
-function autoload_init()
+function autoload_init(o)
 {
-    xhr_url = get_xhr_url();
+    xhr_url = get_boardfeedresource_url(o);
     if (!xhr_url)
 	return;
     
@@ -69,12 +89,13 @@ function remaining_scroll()
 
 function watch_for_scroll()
 {
-    if (remaining_scroll() < window.innerHeight * 2 && !autoload.requestingMoreResults)
+    if (remaining_scroll() < window.innerHeight && !autoload.requestingMoreResults)
     {
         autoload.requestingMoreResults = true;  
         request_more_results();
     }
-    setTimeout(watch_for_scroll, 200);
+    else
+	setTimeout(watch_for_scroll, 200);
 }
 
 
@@ -231,8 +252,7 @@ function new_item(item)
 
 function process_autoload_results(res)
 {
-    console.log("xhr worked !");
-    // window.xhr_res = res;            // FIXME for debugging
+    // console.log("xhr worked !");
     
     var o = JSON.parse(res);
     var fragment = document.createDocumentFragment();
@@ -247,8 +267,8 @@ function process_autoload_results(res)
     document.body.columns_items = 0; // force
     layout();
 
-    // TODO load next results ...
-    // autoload.requestingMoreResults = false;
+    autoload.requestingMoreResults = false;
+    autoload_init(o);
 }
 
 function autoload_error()
@@ -352,7 +372,7 @@ function main()
     layout();
     add_style(".GridItems.variableHeightLayout > .item \
                     { visibility:visible; } ");
-    autoload_init();
+    autoload_init(null);
 }
 
 on_document_ready(add_styles);
