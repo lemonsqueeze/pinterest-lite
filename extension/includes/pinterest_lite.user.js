@@ -11,40 +11,21 @@
 
 /********************************************************************************/
 
-var board_id = 0;
-var bookmarks = "";
 var board_url = location.pathname;
-
-function find_bookmarks()
-{
-    var script = document.querySelector('script#jsInit');
-    var s = script.innerText;
-    var m = s.match(/BoardFeedResource[^}]*"board_id": "([^"]*)"[^}]*"(LT4z[^"]*)"/);
-    board_id = m[1];
-    bookmarks = m[2];
-}
 
 function get_xhr_url()
 {
-    var data = {
-	options: {
-	    board_id: board_id,
-	    add_pin_rep_with_place: false,
-	    board_url: board_url,
-	    page_size: null,
-	    prepend: true,
-	    access: [],
-	    board_layout: "default",
-	    bookmarks: [ bookmarks ]
-	},
-	context: {}
-    };
-
-    var s = JSON.stringify(data);
+    var script = document.querySelector('script#jsInit');
+    var s = script.innerText;
+    var m = s.match(/"BoardFeedResource", ([^}]*})/);
+    var data = JSON.parse('{' + m[1] + '}');    
+    data.context = {};
+    s = JSON.stringify(data);
     s = encodeURI(s);
     s = s.replace(/:/g, '%3A');
     s = s.replace(/,/g, '%2C');
     s = s.replace(/\//g, '%2F');
+    s = s.replace(/=/g, '%3D');
 
     var url = ("/resource/BoardFeedResource/get/?source_url=" + board_url.replace(/\//g, '%2F') +
 	       "&data=" + s +
@@ -140,7 +121,6 @@ function main()
     window.onresize = layout;
     layout();
 
-    find_bookmarks();
     console.log(get_xhr_url());
 }
 
