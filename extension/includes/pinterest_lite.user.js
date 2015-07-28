@@ -450,13 +450,29 @@ function layout()
 
 function add_styles()
 {
-    // FIXME pin pages: user images in related pins are screwed up...
     add_style(".Pin.summary .pinImg  \
-                    { opacity: 1; } ");                // make board images visible
-    add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
-                    { opacity: 1; } ");		// remove pin icons greyout
-    add_style(".relatedBoardsWrapper .Grid.Module  \
-                    { width: 1000px; height: 662px; overflow-y:hidden; } ");          // for pin page
+                    { opacity: 1; } ");			// make board images visible
+    add_style(".creditImg.user img  \
+                    { position: static; } ");		// fix user images
+    
+    if (page_type == 'pin')
+    {
+	add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
+                      { opacity: 1; } ");		// remove pin icons greyout
+	
+	add_style(".relatedBoardsWrapper .Grid.Module  \
+                      { width: 1000px; height: 662px; overflow-y:hidden; } ");          // for pin page
+    }
+}
+
+function fix_user_images()
+{
+    var imgs = document.querySelectorAll('img[data-src]');
+    for (var i = 0; i < imgs.length; i++)
+    {
+	imgs[i].src = imgs[i].getAttribute('data-src');
+	imgs[i].removeAttribute('data-src');
+    }
 }
 
 function main()
@@ -468,6 +484,8 @@ function main()
     layout();
     add_style(".GridItems.variableHeightLayout > .item \
                     { visibility:visible; } ");
+    
+    fix_user_images();
     autoload_init(null);
 }
 
