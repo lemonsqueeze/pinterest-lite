@@ -282,27 +282,27 @@ function on_document_ready(f)
     setTimeout(check_ready, 50);
 }
 
-function removeall(l)
-{
-    for (var i = l.length - 1; i >= 0; i--)
-	l[i].parentNode.removeChild(l[i]);
-}
-
 function layout_items(columns, container_selector)
 {
     var containers = document.querySelectorAll(container_selector);
     for (var j = 0; j < containers.length; j++)
     {
 	var container = containers[j];
+	var last_tops = [], top_col = 0;	// last_tops[top_col] = highest free spot at the bottom
+	for (var k = 0; k < columns; k++)
+	    last_tops[k] = 0;
 	var items = container.querySelectorAll('div.item');
 	for (var i = 0; i < items.length; i++)
 	{
-	    if (i % columns == 0)
-	    {
-		var div = document.createElement('div');
-		div.className = 'clearfloats';
-		container.insertBefore(div, items[i]);
-	    }
+	    console.log('positioning item ' + i);
+	    var top = last_tops[top_col];
+	    var left = top_col * (236 + 14);
+	    items[i].style = 'top: ' + top + 'px; left: ' + left + 'px; ';
+	    last_tops[top_col] += items[i].offsetHeight + 14;
+	    // update top_col
+	    for (var k = 0; k < columns; k++)
+		if (last_tops[k] < last_tops[top_col])
+		    top_col = k;
 	}   
     }        
 }
@@ -314,9 +314,6 @@ function layout()
     if (columns == document.body.columns_items)  // unchanged
 	return;
     document.body.columns_items = columns;
-
-    // remove previous clearfloat divs in case of resize
-    removeall(document.querySelectorAll('div.clearfloats'));
 
     var selectors = [    
 	'.locationBoardPageContentWrapper .GridItems.variableHeightLayout',	// board page   
@@ -330,12 +327,8 @@ function layout()
 
 function add_styles()
 {
-    add_style(".GridItems.variableHeightLayout > .item \
-                    { float:left; position:static; visibility:visible; } ");
-    add_style(".GridItems.variableHeightLayout > .clearfloats \
-                    { clear: both; } ");
-    add_style(".Pin.summary .pinImg  \
-                    { opacity: 1; } ");		// make board images visible
+   add_style(".GridItems.variableHeightLayout > .item \
+                    { float:left; position:static; visibility:hidden; } ");
     add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
                     { opacity: 1; } ");		// remove pin icons greyout
 }
@@ -347,6 +340,11 @@ function main()
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
     layout();
+
+    add_style(".GridItems.variableHeightLayout > .item \
+                    { float:inherit; position:absolute; visibility:visible; } ");
+    add_style(".Pin.summary .pinImg  \
+                    { opacity: 1; } ");		// make board images visible
 
     autoload_init();
 }
