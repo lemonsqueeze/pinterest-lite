@@ -361,6 +361,8 @@ function add_styles()
                     { opacity: 1; } ");                // make board images visible
     add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
                     { opacity: 1; } ");		// remove pin icons greyout
+    add_style(".relatedBoardsWrapper .Grid.Module  \
+                    { width: 1000px; height: 662px; overflow-y:hidden; } ");          // for pin page
 }
 
 function main()
