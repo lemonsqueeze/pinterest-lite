@@ -288,22 +288,32 @@ function layout_items(columns, container_selector)
     for (var j = 0; j < containers.length; j++)
     {
 	var container = containers[j];
+	var items = container.querySelectorAll('div.item');
+	if (!items.length)  // sanity check
+	    continue;
+
+	var clone = container.cloneNode(true);	// change cloned items to avoid reflows
+	var clones = clone.querySelectorAll('div.item');
+
 	var last_tops = [], top_col = 0;	// last_tops[top_col] = highest free spot at the bottom
 	for (var k = 0; k < columns; k++)
 	    last_tops[k] = 0;
-	var items = container.querySelectorAll('div.item');
+
 	for (var i = 0; i < items.length; i++)
 	{
-	    console.log('positioning item ' + i);
 	    var top = last_tops[top_col];
 	    var left = top_col * (236 + 14);
-	    items[i].style = 'top: ' + top + 'px; left: ' + left + 'px; ';
-	    last_tops[top_col] += items[i].offsetHeight + 14;
-	    // update top_col
-	    for (var k = 0; k < columns; k++)
+	    // setting style.cssText supposedly faster than .style
+	    clones[i].style.cssText += '; top: ' + top + 'px; left: ' + left + 'px; ';
+	    // clones[i].style = '; top: ' + top + 'px; left: ' + left + 'px; ';
+	    
+	    last_tops[top_col] += items[i].offsetHeight + 14;	    
+	    for (var k = 0; k < columns; k++)			// update top_col
 		if (last_tops[k] < last_tops[top_col])
 		    top_col = k;
-	}   
+	}
+
+	container.parentNode.replaceChild(clone, container);
     }        
 }
 
@@ -327,8 +337,8 @@ function layout()
 
 function add_styles()
 {
-   add_style(".GridItems.variableHeightLayout > .item \
-                    { float:left; position:static; visibility:hidden; } ");
+    add_style(".Pin.summary .pinImg  \
+                    { opacity: 1; } ");                // make board images visible
     add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
                     { opacity: 1; } ");		// remove pin icons greyout
 }
@@ -340,12 +350,8 @@ function main()
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
     layout();
-
     add_style(".GridItems.variableHeightLayout > .item \
-                    { float:inherit; position:absolute; visibility:visible; } ");
-    add_style(".Pin.summary .pinImg  \
-                    { opacity: 1; } ");		// make board images visible
-
+                    { visibility:visible; } ");
     autoload_init();
 }
 
