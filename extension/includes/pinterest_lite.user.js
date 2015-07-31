@@ -21,6 +21,7 @@ if (is_prefix("/pin/", window.location.pathname))
     page_type = "pin";
 if (is_prefix("/source/", window.location.pathname))
     page_type = "source";
+console.log('page type: ' + page_type);
 
 
 /********************************************************************************/
@@ -108,7 +109,6 @@ function get_boardfeedresource_url(o)
 
 function get_xhr_url(o)
 {
-    console.log('page type: ' + page_type);
     if (page_type == 'board')
 	return get_boardfeedresource_url(o);
     if (page_type == 'pin')
@@ -134,7 +134,7 @@ function autoload_init(o)
 function request_more_results()
 {    
     console.log("getting more items ...");
-    console.log(xhr_url);
+//    console.log(xhr_url);
     getURL(xhr_url, process_autoload_results, autoload_error);
 }
 
@@ -185,10 +185,14 @@ function doXHR(url, callback, error_callback)  // asynchronous
     xhr.send();
 }    
 
-var item_template =  [
+
+function new_item(item)
+{
+
+    var item_template =  [
 '<div class="item " itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem">', 
 //'  <meta itemprop="position" content="2">'
-'  <meta itemprop="url" content="https://www.pinterest.com/pin/%%id%%/">', 
+'  <meta itemprop="url" content="https://www.pinterest.com/pin/' + item.id + '/">', 
 '  <div class="Module Pin summary" data-component-type="0" >',   // id="Pin-53"
 '    <div class="pinWrapper">',
 '      <div class="bulkEditPinWrapper">',
@@ -207,13 +211,13 @@ var item_template =  [
 '          </button>',
 '        </div>',
 '        <div class="pinHolder">',
-'          <a href="/pin/%%id%%/" class="pinImageWrapper" data-element-type="35" style="background: #282223;" title="%%description%%">',
-'            <h4 class="pinCanonicalDescription">%%description_html%%</h4>',
+'          <a href="/pin/' + item.id + '/" class="pinImageWrapper" data-element-type="35" style="background: #282223;" title="' + item.description + '">',
+'            <h4 class="pinCanonicalDescription">' + item.description_html + '</h4>',
 '            <div class="fadeContainer">',
 '              <div class="hoverMask"></div>',
 '              <div class="Image Module pinUiImage"  style="width: 236px">',   // id="Image-84"
 '                <div class="heightContainer" style="padding-bottom: 133.050847%">',
-'                  <img src="%%img236_url%%" class="pinImg fullBleed" onload="P.lazy.onImageLoad(this)" alt="%%description%%">',
+'                  <img src="' + item.images['236x'].url + '" class="pinImg fullBleed" onload="P.lazy.onImageLoad(this)" alt="' + item.description + '">',
 '                </div>',
 '              </div>',
 '            </div>',
@@ -223,7 +227,7 @@ var item_template =  [
 '      <div class="pinMeta ">',
 '        <p class="pinDescription">',
 '          ',
-'               %%description_html%%',
+'               ' + item.description_html,
 '                        ',
 '          <button class="Button Module borderless hasText vaseButton"  type="button">', // id="Button-85"
 '            <span class="buttonText">More</span>',
@@ -237,10 +241,10 @@ var item_template =  [
 //'        <h4 class="vaseText hidden">Mermaids, dragons, demons, oh my!</h4>',
 '        <div class="Module SocialIconsCounts" >',   // id="SocialIconsCounts-86"
 '          <div class="pinSocialMeta">',
-'            <a class="socialItem" href="/pin/%%id%%/repins/" data-element-type="174">',
+'            <a class="socialItem" href="/pin/' + item.id + '/repins/" data-element-type="174">',
 '              <em class="repinIconSmall"></em>',
 '              <em class="socialMetaCount repinCountSmall">',
-'                %%repin_count%%',
+'                ' + item.repin_count,
 '            </em>',
 '            </a>',
 '          </div>',
@@ -249,10 +253,10 @@ var item_template =  [
 '      <div class="pinCredits">',
 '        <div class="creditItem ">',
 '          <div class="creditName">',
-'            <h3>%%title%%</h3>',
+'            <h3>' + item.title + '</h3>',
 '          </div>',
 '          <div class="creditTitle">',
-'                                                                                                    %%domain%%',
+'                                                                                                   ' + item.domain,
 '                                </div>',
 '        </div>',
 '      </div>',
@@ -280,27 +284,9 @@ var item_template =  [
 '    </div>',
 '  </div>',
 '</div>'
-];
+    ];
 
-var item_regexps = null;
-function init_item_regexps()
-{
-    item_regexps = {};
-    var props = [ "description", "description_html", "title", "id", "domain", "repin_count" ];
-    for (var i in props)
-	item_regexps[props[i]] = new RegExp('%%' + props[i] + '%%', 'g');
-}
-
-function new_item(item)
-{
     var s = item_template.join('\n');
-    if (!item_regexps)
-	init_item_regexps();
-
-    for (var i in item_regexps)
-	s = s.replace(item_regexps[i], item[i]);
-    s = s.replace(/%%img236_url%%/g, item.images['236x'].url);
-    
     // console.log(s);
     var e = document.createElement('el');
     e.innerHTML = s;
