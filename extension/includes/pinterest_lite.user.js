@@ -15,6 +15,10 @@
 if (window != window.top)   // in iframe
     return;
 
+// layout_type: type of layout to use for images.
+var layout_type = 'float';   // faster
+//var layout_type = 'tile';    
+
 var page_type = "board";
 
 if (is_prefix("/pin/", window.location.pathname))
@@ -381,7 +385,7 @@ function on_document_ready(f)
     setTimeout(check_ready, 50);
 }
 
-function layout_items(columns, container_selector)
+function layout_items_tile(columns, container_selector)
 {
     var containers = document.querySelectorAll(container_selector);
     for (var j = 0; j < containers.length; j++)
@@ -416,6 +420,32 @@ function layout_items(columns, container_selector)
     }        
 }
 
+function removeall(l)
+{
+    for (var i = l.length - 1; i >= 0; i--)
+	l[i].parentNode.removeChild(l[i]);
+}
+
+function layout_items_float(columns, container_selector)
+{
+    var containers = document.querySelectorAll(container_selector);
+    for (var j = 0; j < containers.length; j++)
+    {
+	var container = containers[j];
+	var items = container.querySelectorAll('div.item');
+	for (var i = 0; i < items.length; i++)
+	{
+	    if (i % columns == 0)
+	    {
+		var div = document.createElement('div');
+		div.className = 'clearfloats';
+		container.insertBefore(div, items[i]);
+	    }
+	}   
+    }        
+}
+
+
 function layout()
 {
     var columns = Math.floor(window.innerWidth / (236 + 14));
@@ -423,19 +453,32 @@ function layout()
     if (columns == document.body.columns_items)  // unchanged
 	return;
     document.body.columns_items = columns;
-
+    
+    // remove previous clearfloat divs in case of resize
+    if (layout_type == 'float')
+	removeall(document.querySelectorAll('div.clearfloats'));
+    
     var selectors = [    
 	'.locationBoardPageContentWrapper .GridItems.variableHeightLayout',	// board page   
 	'.gridContainer .GridItems.variableHeightLayout',			// pin page
 	'.DomainFeedPage .GridItems.variableHeightLayout'			// source page
     ];
 
+    var layout_func = (layout_type == 'float' ? layout_items_float : layout_items_tile);
     for (var i = 0; i < selectors.length; i++)
-	layout_items(columns, selectors[i]);
+	layout_func(columns, selectors[i]);
 }
 
 function add_styles()
 {
+    if (layout_type == 'float')
+    {
+	add_style(".GridItems.variableHeightLayout > .item \
+                      { float:left; position:static; visibility:visible; } ");
+	add_style(".GridItems.variableHeightLayout > .clearfloats \
+                      { clear: both; } ");
+    }
+
     add_style(".Pin.summary .pinImg  \
                     { opacity: 1; } ");			// make board images visible
     add_style(".creditImg.user img  \
@@ -468,8 +511,9 @@ function main()
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
     layout();
-    add_style(".GridItems.variableHeightLayout > .item \
-                    { visibility:visible; } ");
+    if (layout_type == 'tile')
+	add_style(".GridItems.variableHeightLayout > .item \
+                      { visibility:visible; } ");
     
     fix_user_images();
     autoload_init(null);
