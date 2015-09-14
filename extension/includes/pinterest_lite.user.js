@@ -479,6 +479,8 @@ function add_styles()
                       { clear: both; } ");
     }
 
+    add_style(".pinMeta p.pinDescription \
+                    { display:none; } ");		// remove pin descriptions
     add_style(".Pin.summary .pinImg  \
                     { opacity: 1; } ");			// make board images visible
     add_style(".creditImg.user img  \
