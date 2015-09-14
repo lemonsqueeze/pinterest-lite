@@ -499,9 +499,7 @@ function layout()
 	removeall(document.querySelectorAll('div.clearfloats'));
     
     var selectors = [    
-	'.locationBoardPageContentWrapper .GridItems.variableHeightLayout',	// board page   
-	'.gridContainer .GridItems.variableHeightLayout',			// pin page
-	'.DomainFeedPage .GridItems.variableHeightLayout'			// source page
+	'.GridItems.variableHeightLayout'
     ];
 
     for (var i = 0; i < selectors.length; i++)
