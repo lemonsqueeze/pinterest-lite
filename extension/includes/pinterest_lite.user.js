@@ -16,8 +16,8 @@ if (window != window.top)   // in iframe
     return;
 
 // layout_type: type of layout to use for images.
-//var layout_type = 'float';   // faster
-var layout_type = 'table';   
+var layout_type = 'float';   // faster
+//var layout_type = 'table';   
 //var layout_type = 'tile';    
 
 var page_type = "board";
