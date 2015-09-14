@@ -16,7 +16,8 @@ if (window != window.top)   // in iframe
     return;
 
 // layout_type: type of layout to use for images.
-var layout_type = 'float';   // faster
+//var layout_type = 'float';   // faster
+var layout_type = 'table';   
 //var layout_type = 'tile';    
 
 var page_type = "board";
@@ -420,6 +421,41 @@ function layout_items_tile(columns, container_selector)
     }        
 }
 
+function layout_items_table(columns, container_selector)
+{
+    var containers = document.querySelectorAll(container_selector);
+    for (var j = 0; j < containers.length; j++)
+    {
+	var container = containers[j];
+
+	var clone = container.cloneNode(true);	// change cloned items to avoid reflows
+	var clones = clone.querySelectorAll('div.item');
+	if (!clones.length)  // sanity check
+	    continue;
+
+	var table = document.createElement('table');
+	table.className = 'items_table_layout';
+	var tr = document.createElement('tr');
+	table.appendChild(tr);
+	for (var i = 0; i < clones.length; i++)
+	{
+	    if (i && i % columns == 0)
+	    {
+		tr = document.createElement('tr');
+		table.appendChild(tr);		
+	    }
+	    
+	    var td = document.createElement('td');
+	    td.appendChild(clones[i]);
+	    tr.appendChild(td);
+	}
+
+	clone = container.cloneNode(false);  // without children this time
+	clone.appendChild(table);
+	container.parentNode.replaceChild(clone, container);
+    }        
+}
+
 function removeall(l)
 {
     for (var i = l.length - 1; i >= 0; i--)
@@ -445,6 +481,10 @@ function layout_items_float(columns, container_selector)
     }        
 }
 
+var layout_functions = { float: layout_items_float, 
+			 table: layout_items_table,
+			 tile:  layout_items_tile
+		       };
 
 function layout()
 {
@@ -464,19 +504,26 @@ function layout()
 	'.DomainFeedPage .GridItems.variableHeightLayout'			// source page
     ];
 
-    var layout_func = (layout_type == 'float' ? layout_items_float : layout_items_tile);
     for (var i = 0; i < selectors.length; i++)
-	layout_func(columns, selectors[i]);
+	layout_functions[layout_type](columns, selectors[i]);
 }
 
 function add_styles()
 {
-    if (layout_type == 'float')
+    if (layout_type == 'float' || layout_type == 'table')
     {
 	add_style(".GridItems.variableHeightLayout > .item \
                       { float:left; position:static; visibility:visible; } ");
 	add_style(".GridItems.variableHeightLayout > .clearfloats \
                       { clear: both; } ");
+    }
+
+    if (layout_type == 'table')
+    {
+	add_style(".items_table_layout td \
+                      { vertical-align:top; padding:7px; } ");
+	add_style(".items_table_layout  \
+                      { border-spacing:0px; } ");
     }
 
     add_style(".pinMeta p.pinDescription \
