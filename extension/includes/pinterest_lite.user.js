@@ -195,64 +195,21 @@ function new_item(item)
 {
 
     var item_template =  [
-'<div class="item " itemprop="itemListElement" itemscope="" itemtype="http://schema.org/ListItem">', 
-//'  <meta itemprop="position" content="2">'
-'  <meta itemprop="url" content="https://www.pinterest.com/pin/' + item.id + '/">', 
+'<div class="item " >', 
 '  <div class="Module Pin summary" data-component-type="0" >',   // id="Pin-53"
 '    <div class="pinWrapper">',
-'      <div class="bulkEditPinWrapper">',
-'                    </div>',
 '      <div class="pinImageActionButtonWrapper">',
-'        <div class="repinSendButtonWrapper">',
-'          <button class="Button Module ShowModalButton btn primary primaryOnHover repinSmall rounded" data-element-type="0"  type="button">',  // id="ShowModalButton-82"
-'            <em></em>',
-'            <span class="accessibilityText">Pin it</span>',
-'          </button>',
-'        </div>',
-'        <div class="likeEditButtonWrapper">',
-'          <button class="Button LikeButton Module PinLikeButton btn likeSmall rounded" data-element-type="1" data-source-interest-id="" data-text-like="Like" data-text-unlike="Unlike"  type="button">',  // id="PinLikeButton-83"
-'            <em></em>',
-'            <span class="accessibilityText">Like</span>',
-'          </button>',
-'        </div>',
 '        <div class="pinHolder">',
-'          <a href="/pin/' + item.id + '/" class="pinImageWrapper" data-element-type="35" style="background: #282223;" title="' + item.description + '">',
+'          <a href="/pin/' + item.id + '/" class="pinImageWrapper" data-element-type="35" style="background: #26231e;" title="">',
 '            <h4 class="pinCanonicalDescription">' + item.description_html + '</h4>',
 '            <div class="fadeContainer">',
-'              <div class="hoverMask"></div>',
 '              <div class="Image Module pinUiImage"  style="width: 236px">',   // id="Image-84"
-'                <div class="heightContainer" style="padding-bottom: 133.050847%">',
-'                  <img src="' + item.images['236x'].url + '" class="pinImg fullBleed" onload="P.lazy.onImageLoad(this)" alt="' + item.description + '">',
+'                <div class="heightContainer" style="padding-bottom: 143.644067%">',
+'                  <img src="' + item.images['236x'].url + '" class="pinImg fullBleed" alt="' + item.description + '">',
 '                </div>',
 '              </div>',
 '            </div>',
 '          </a>',
-'        </div>',
-'      </div>',
-'      <div class="pinMeta ">',
-'        <p class="pinDescription">',
-'          ',
-'               ' + item.description_html,
-'                        ',
-'          <button class="Button Module borderless hasText vaseButton"  type="button">', // id="Button-85"
-'            <span class="buttonText">More</span>',
-'          </button>',
-'        </p>',
-// '        <h4 class="vaseText hidden">Demons, Legends, Fantasy Art, Laura Sava, Fallen Angel, Angel Warriors, Cryptid, Dark Angels, Arte Digital</h4>',
-//'        <h4 class="vaseText hidden">Legend of the Cryptids - Amarie by Laura Sava, via Behance</h4>',
-//'        <h4 class="vaseText hidden">Dark angel, female beauty, Wings, fantasy art</h4>',
-//'        <h4 class="vaseText hidden">Angel warrior</h4>',
-//'        <h4 class="vaseText hidden">fantasy fallen angel</h4>',
-//'        <h4 class="vaseText hidden">Mermaids, dragons, demons, oh my!</h4>',
-'        <div class="Module SocialIconsCounts" >',   // id="SocialIconsCounts-86"
-'          <div class="pinSocialMeta">',
-'            <a class="socialItem" href="/pin/' + item.id + '/repins/" data-element-type="174">',
-'              <em class="repinIconSmall"></em>',
-'              <em class="socialMetaCount repinCountSmall">',
-'                ' + item.repin_count,
-'            </em>',
-'            </a>',
-'          </div>',
 '        </div>',
 '      </div>',
 '      <div class="pinCredits">',
@@ -264,27 +221,6 @@ function new_item(item)
 '                                                                                                   ' + item.domain,
 '                                </div>',
 '        </div>',
-'      </div>',
-'      <div class="sharedContentPosting hidden" itemprop="item" itemscope="" itemtype="http://schema.org/SharedContentPosting">',
-// '        <meta itemprop="upvoteCount" content="133">',
-// '        <meta itemprop="sharedCount" content="462">',
-// '        <meta itemprop="commentCount" content="1">',
-// '        <meta itemprop="text" content="Amarie by anotherwanderer armor clothes clothing fashion player character npc | Create your own roleplaying game material w/ RPG Bard: www.rpgbard.com | Writing inspiration for Dungeons and Dragons DND D&D Pathfinder PFRPG Warhammer 40k Star Wars Shadowrun Call of Cthulhu Lord of the Rings LoTR + d20 fantasy science fiction scifi horror design | Not Trusty Sword art: click artwork for source">',
-//'        <div itemprop="user" itemscope="" itemtype="http://schema.org/Person">',
-//'          <meta itemprop="name" content="Trusty Sword Entertainment">',
-//'          <meta itemprop="url" content="https://www.pinterest.com/trustyswordent/">',
-//'          <meta itemprop="image" content="https://s-media-cache-ak0.pinimg.com/avatars/trustyswordent_1395642539_30.jpg">',
-//'        </div>',
-//'        <meta itemprop="datePublished" content="2014-05-08T07:05:50">',
-//'        <meta itemprop="image" content="https://s-media-cache-ak0.pinimg.com/736x/f7/63/d3/f763d33ef5a6a92eef770ed462641cca.jpg">',
-//'        <meta itemprop="category" content="https://www.pinterest.com/ghdwn862/d/">',
-//'        <div class="sharedContent" itemprop="sharedContent" itemscope="" itemtype="http://schema.org/WebPage">',
-//'          <meta itemprop="name" content="Amarie by anotherwanderer on deviantART">',
-//'          <div itemprop="author" itemscope="" itemtype="http://schema.org/Organization">',
-//'            <meta itemprop="name" content="anotherwanderer.deviantart.com">',
-//'          </div>',
-//'          <meta itemprop="url" content="/pin/380343131003358743/">',
-//'        </div>',
 '      </div>',
 '    </div>',
 '  </div>',
@@ -488,17 +424,6 @@ var layout_functions = { float: layout_items_float,
 
 function layout()
 {
-    // remove unwanted stuff
-    removeall(document.querySelectorAll(".pinMeta"));
-    removeall(document.querySelectorAll(".pinImageDim"));
-    removeall(document.querySelectorAll(".repinSendButtonWrapper"));
-    removeall(document.querySelectorAll(".likeEditButtonWrapper"));
-    removeall(document.querySelectorAll(".Pin.summary .pinImageActionButtonWrapper a.pinNavLink"));
-    removeall(document.querySelectorAll(".pinDomain"));
-
-    removeall(document.querySelectorAll(".bulkEditPinWrapper"));
-    removeall(document.querySelectorAll(".sharedContentPosting"));
-
     var columns = Math.floor(window.innerWidth / (236 + 14));
     console.warn('columns: ' + columns);
     if (columns == document.body.columns_items)  // unchanged
@@ -551,6 +476,25 @@ function add_styles()
     add_style(".unAuthCookieBar { display: none; }");  // remove cookie notice
 }
 
+function remove_unwanted_stuff()
+{
+    removeall(document.querySelectorAll(".pinMeta"));
+    removeall(document.querySelectorAll(".pinImageDim"));
+    removeall(document.querySelectorAll(".repinSendButtonWrapper"));
+    removeall(document.querySelectorAll(".likeEditButtonWrapper"));
+    removeall(document.querySelectorAll(".Pin.summary .pinImageActionButtonWrapper a.pinNavLink"));
+    removeall(document.querySelectorAll(".pinDomain"));
+
+    removeall(document.querySelectorAll(".bulkEditPinWrapper"));
+    removeall(document.querySelectorAll(".sharedContentPosting"));
+    removeall(document.querySelectorAll(".item meta"));
+
+    // remove titles
+    var links = document.querySelectorAll('.GridItems.variableHeightLayout .item .pinHolder > a');
+    for (var i = 0; i < links.length; i++)
+	links[i].title = "";
+}
+
 function fix_user_images()
 {
     var imgs = document.querySelectorAll('img[data-src]');
@@ -567,6 +511,7 @@ function main()
 
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
+    remove_unwanted_stuff();
     layout();
     if (layout_type == 'tile')
 	add_style(".GridItems.variableHeightLayout > .item \
