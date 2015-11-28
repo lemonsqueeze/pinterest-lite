@@ -488,6 +488,17 @@ var layout_functions = { float: layout_items_float,
 
 function layout()
 {
+    // remove unwanted stuff
+    removeall(document.querySelectorAll(".pinMeta"));
+    removeall(document.querySelectorAll(".pinImageDim"));
+    removeall(document.querySelectorAll(".repinSendButtonWrapper"));
+    removeall(document.querySelectorAll(".likeEditButtonWrapper"));
+    removeall(document.querySelectorAll(".Pin.summary .pinImageActionButtonWrapper a.pinNavLink"));
+    removeall(document.querySelectorAll(".pinDomain"));
+
+    removeall(document.querySelectorAll(".bulkEditPinWrapper"));
+    removeall(document.querySelectorAll(".sharedContentPosting"));
+
     var columns = Math.floor(window.innerWidth / (236 + 14));
     console.warn('columns: ' + columns);
     if (columns == document.body.columns_items)  // unchanged
@@ -498,12 +509,7 @@ function layout()
     if (layout_type == 'float')
 	removeall(document.querySelectorAll('div.clearfloats'));
     
-    var selectors = [    
-	'.GridItems.variableHeightLayout'
-    ];
-
-    for (var i = 0; i < selectors.length; i++)
-	layout_functions[layout_type](columns, selectors[i]);
+    layout_functions[layout_type](columns, '.GridItems.variableHeightLayout');
 }
 
 function add_styles()
@@ -512,33 +518,37 @@ function add_styles()
     {
 	add_style(".GridItems.variableHeightLayout > .item \
                       { float:left; position:static; visibility:visible; } ");
-	add_style(".GridItems.variableHeightLayout > .clearfloats \
-                      { clear: both; } ");
+	add_style(".GridItems.variableHeightLayout > .clearfloats  { clear: both; } ");
     }
 
     if (layout_type == 'table')
     {
-	add_style(".items_table_layout td \
-                      { vertical-align:top; padding:7px; } ");
-	add_style(".items_table_layout  \
-                      { border-spacing:0px; } ");
+	add_style(".items_table_layout td   { vertical-align:top; padding:7px; } ");
+	add_style(".items_table_layout      { border-spacing:0px; } ");
     }
 
-    add_style(".pinMeta p.pinDescription \
-                    { display:none; } ");		// remove pin descriptions
-    add_style(".Pin.summary .pinImg  \
-                    { opacity: 1; } ");			// make board images visible
-    add_style(".creditImg.user img  \
-                    { position: static; } ");		// fix user images
+    add_style(".Pin.summary .pinImg   { opacity: 1; } ");		// make board images visible
+    add_style(".creditImg.user img    { position: static; } ");		// fix user images
     
     if (page_type == 'pin')
     {
-	add_style(".Board.boardPinsGrid .pinGridWrapper .item  \
-                      { opacity: 1; } ");		// remove pin icons greyout
+	add_style(".Board.boardPinsGrid .pinGridWrapper .item { opacity: 1; } "); // remove pin icons greyout
 	
 	add_style(".relatedBoardsWrapper .Grid.Module  \
                       { width: 1000px; height: 662px; overflow-y:hidden; } ");          // for pin page
     }
+
+    // FIXME keep in sync with layout() removeall()'s
+    add_style(".pinMeta   { display:none; } ");	// remove pin descriptions
+    add_style(".pinImageDim { display: none; }");  // remove image dimmer
+    add_style(".repinSendButtonWrapper { display: none; }");  // remove image buttons
+    add_style(".likeEditButtonWrapper { display: none; }");  // remove image buttons
+    add_style(".Pin.summary .pinImageActionButtonWrapper a.pinNavLink { display: none; }");  // remove image buttons
+    add_style(".pinDomain { display: none; }");  // remove pin domain div
+
+    // one time stuff
+    add_style(".NagNoScript.NagBase.Module { display: none; }");  // remove javascript needed banner
+    add_style(".unAuthCookieBar { display: none; }");  // remove cookie notice
 }
 
 function fix_user_images()
