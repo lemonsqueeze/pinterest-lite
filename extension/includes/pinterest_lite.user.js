@@ -254,7 +254,7 @@ function process_related_pin_feed_results(res)
 	var item = o.resource_response.data[i];
 	fragment.appendChild(new_item(item));  // FIXME template for pin items is different !
     }
-    var parent = document.querySelector('.relatedPinsWrapper .GridItems.variableHeightLayout'); // board page
+    var parent = document.querySelector('.rightSection .GridItems.variableHeightLayout'); // board page
     parent.appendChild(fragment);
 
     document.body.columns_items = 0; // force
@@ -425,6 +425,9 @@ var layout_functions = { float: layout_items_float,
 function layout()
 {
     var columns = Math.floor(window.innerWidth / (236 + 14));
+    if (page_type == 'pin')  // right side only ...
+	columns = Math.floor(document.querySelector('.rightSection').clientWidth / (236 + 14));
+
     console.warn('columns: ' + columns);
     if (columns == document.body.columns_items)  // unchanged
 	return;
