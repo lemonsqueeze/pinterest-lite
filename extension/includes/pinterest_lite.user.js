@@ -407,12 +407,35 @@ function layout_items_float(columns, container_selector)
 	var items = container.querySelectorAll('div.item');
 	for (var i = 0; i < items.length; i++)
 	{
-	    if (i % columns == 0)
+	    if (i && i % columns == 0)
 	    {
 		var div = document.createElement('div');
 		div.className = 'clearfloats';
 		container.insertBefore(div, items[i]);
 	    }
+	}   
+    }        
+}
+
+// float related pins around main pin
+function layout_items_float_pin(columns, container_selector)
+{
+    var mainpin = document.querySelector('.mainPin');
+    var containers = document.querySelectorAll(container_selector);
+    for (var j = 0; j < containers.length; j++)
+    {
+	var container = containers[j];
+	var items = container.querySelectorAll('div.item');
+	var k = 0;
+	for (var i = 0; i < items.length; i++)
+	{
+	    if (items[i].offsetTop + items[i].clientHeight > mainpin.clientHeight) // below main pin ?
+		if (k++ % columns == 0)
+	        {
+		    var div = document.createElement('div');
+		    div.className = 'clearfloats';
+		    container.insertBefore(div, items[i]);
+		}
 	}   
     }        
 }
@@ -425,9 +448,6 @@ var layout_functions = { float: layout_items_float,
 function layout()
 {
     var columns = Math.floor(window.innerWidth / (236 + 14));
-    if (page_type == 'pin')  // right side only ...
-	columns = Math.floor(document.querySelector('.rightSection').clientWidth / (236 + 14));
-
     console.warn('columns: ' + columns);
     if (columns == document.body.columns_items)  // unchanged
 	return;
@@ -436,8 +456,11 @@ function layout()
     // remove previous clearfloat divs in case of resize
     if (layout_type == 'float')
 	removeall(document.querySelectorAll('div.clearfloats'));
-    
-    layout_functions[layout_type](columns, '.GridItems.variableHeightLayout');
+
+    if (page_type == 'pin')
+	layout_items_float_pin(columns, '.GridItems.variableHeightLayout');
+    else
+	layout_functions[layout_type](columns, '.GridItems.variableHeightLayout');
 }
 
 function add_styles()
@@ -461,9 +484,7 @@ function add_styles()
     if (page_type == 'pin')
     {
 	add_style(".Board.boardPinsGrid .pinGridWrapper .item { opacity: 1; } "); // remove pin icons greyout
-	
-	// move right section below so we can use 4 columns for related pins
-	add_style(".UnauthPinInGridCloseup .topSection { display: block; }"); 
+	add_style(".mainPin { float: left; }");
     }
 
     // FIXME keep in sync with layout() removeall()'s
@@ -498,6 +519,21 @@ function remove_unwanted_stuff()
 	links[i].title = "";
 }
 
+function fix_pin_layout()
+{
+    if (page_type != "pin")
+	return;
+
+    var pin = document.querySelector(".mainPin");
+    var grid = document.querySelector(".GridItems");
+    // put main pin in the grid so we can float things around
+    grid.insertBefore(pin, grid.firstChild);
+
+    var title = document.querySelector(".relatedPinsTitle");
+    title.parentNode.removeChild(title);  // remove title
+    // grid.insertBefore(title, grid.children[1]);  // move title afterwards
+}
+
 function fix_user_images()
 {
     var imgs = document.querySelectorAll('img[data-src]');
@@ -515,6 +551,7 @@ function main()
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
     remove_unwanted_stuff();
+    fix_pin_layout();
     layout();
     if (layout_type == 'tile')
 	add_style(".GridItems.variableHeightLayout > .item \
