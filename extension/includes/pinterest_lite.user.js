@@ -462,8 +462,8 @@ function add_styles()
     {
 	add_style(".Board.boardPinsGrid .pinGridWrapper .item { opacity: 1; } "); // remove pin icons greyout
 	
-	add_style(".relatedBoardsWrapper .Grid.Module  \
-                      { width: 1000px; height: 662px; overflow-y:hidden; } ");          // for pin page
+	// move right section below so we can use 4 columns for related pins
+	add_style(".UnauthPinInGridCloseup .topSection { display: block; }"); 
     }
 
     // FIXME keep in sync with layout() removeall()'s
