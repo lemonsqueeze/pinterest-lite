@@ -59,7 +59,10 @@ function first_relatedpinfeedresource_url()
     var m = script.innerText.match(/"RelatedPinFeedResource", ([^}]*}[^}]*})/);
     if (!m)
 	return null;
-    xhr_req_data = JSON.parse('{' + m[1] + '}');    
+    try
+    { xhr_req_data = JSON.parse('{' + m[1] + '}');  }
+    catch (err)
+    { xhr_req_data = JSON.parse('{' + m[1] );  }
     xhr_req_data.context = {};
     return make_relatedpinfeedresource_url(xhr_req_data);
 }
