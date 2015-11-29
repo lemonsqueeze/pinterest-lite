@@ -52,25 +52,10 @@ function make_relatedpinfeedresource_url(data)
     return url;
 }
 
-
-function first_relatedpinfeedresource_url()
-{
-    var script = document.querySelector('script#jsInit');
-    var m = script.innerText.match(/"RelatedPinFeedResource", ([^}]*}[^}]*})/);
-    if (!m)
-	return null;
-    try
-    { xhr_req_data = JSON.parse('{' + m[1] + '}');  }
-    catch (err)
-    { xhr_req_data = JSON.parse('{' + m[1] );  }
-    xhr_req_data.context = {};
-    return make_relatedpinfeedresource_url(xhr_req_data);
-}
-
 function get_relatedpinfeedresource_url(o)
 {
     if (!o)
-	return first_relatedpinfeedresource_url();
+	return make_relatedpinfeedresource_url(xhr_req_data);
     return null;
 }
 
@@ -92,22 +77,12 @@ function make_boardfeedresource_url(data)
     return url;
 }
 
-function first_boardfeedresource_url()
-{
-    var script = document.querySelector('script#jsInit');
-    var m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);
-    if (!m)
-	return null;
-    xhr_req_data = JSON.parse('{' + m[1] + '}');    
-    xhr_req_data.context = {};
-    return make_boardfeedresource_url(xhr_req_data);
-}
 
 function get_boardfeedresource_url(o)
 {
-    if (!o)
-	return first_boardfeedresource_url();
-
+    if (!o)  // first time
+	return make_boardfeedresource_url(xhr_req_data);
+    
     var bookmark = o.resource.options.bookmarks[0];
     if (bookmark == "-end-")
 	return null;
@@ -115,8 +90,29 @@ function get_boardfeedresource_url(o)
     return make_boardfeedresource_url(xhr_req_data);
 }
 
+function init_xhr_req_data()
+{
+    var script = document.querySelector('script#jsInit');
+    var m = null;
+    
+    if (page_type == 'board')
+	m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);    
+    if (page_type == 'pin')
+	m = script.innerText.match(/"RelatedPinFeedResource", ([^}]*}[^}]*})/);
+    if (!m)
+	return;
+    
+    try
+    { xhr_req_data = JSON.parse('{' + m[1] + '}');  }
+    catch (err)
+    { xhr_req_data = JSON.parse('{' + m[1] );  }
+    xhr_req_data.context = {};
+}
+
 function get_xhr_url(o)
 {
+    if (!xhr_req_data)
+	return null;
     if (page_type == 'board')
 	return get_boardfeedresource_url(o);
     if (page_type == 'pin')
@@ -505,6 +501,7 @@ function add_styles()
 
 function remove_unwanted_stuff()
 {
+    removeall(document.querySelectorAll("script"));
     removeall(document.querySelectorAll(".pinMeta"));
     removeall(document.querySelectorAll(".pinImageDim"));
     removeall(document.querySelectorAll(".repinSendButtonWrapper"));
@@ -553,6 +550,7 @@ function main()
 
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
+    init_xhr_req_data();
     remove_unwanted_stuff();
     fix_pin_layout();
     layout();
