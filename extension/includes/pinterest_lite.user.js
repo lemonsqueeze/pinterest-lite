@@ -476,6 +476,8 @@ function add_styles()
     add_style(".creditImg.user img    { position: static; } ");		// fix user images
     // Get rid of evil manual image sizing
     add_style(".Image > .heightContainer > img { position: static;  } ");
+    // Truncate giant images ...
+    add_style(".Image > .heightContainer { max-height: 450px; overflow: hidden; } ");
     
     if (page_type == 'pin')
     {
