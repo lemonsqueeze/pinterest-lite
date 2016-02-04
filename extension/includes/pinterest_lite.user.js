@@ -216,7 +216,6 @@ function new_item(item)
 '      <div class="pinImageActionButtonWrapper">',
 '        <div class="pinHolder">',
 '          <a href="/pin/' + item.id + '/" class="pinImageWrapper" data-element-type="35" style="background: #26231e;" title="">',
-'            <h4 class="pinCanonicalDescription">' + item.description_html + '</h4>',
 '            <div class="fadeContainer">',
 '              <div class="Image Module pinUiImage"  style="width: 236px">',   // id="Image-84"
 '                <div class="heightContainer" >',
