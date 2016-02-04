@@ -203,7 +203,7 @@ function new_item(item)
 '            <h4 class="pinCanonicalDescription">' + item.description_html + '</h4>',
 '            <div class="fadeContainer">',
 '              <div class="Image Module pinUiImage"  style="width: 236px">',   // id="Image-84"
-'                <div class="heightContainer" style="padding-bottom: 143.644067%">',
+'                <div class="heightContainer" >',
 '                  <img src="' + item.images['236x'].url + '" class="pinImg fullBleed" alt="' + item.description + '">',
 '                </div>',
 '              </div>',
@@ -479,6 +479,8 @@ function add_styles()
 
     add_style(".Pin.summary .pinImg   { opacity: 1; } ");		// make board images visible
     add_style(".creditImg.user img    { position: static; } ");		// fix user images
+    // Get rid of evil manual image sizing
+    add_style(".Image > .heightContainer > img { position: static;  } ");
     
     if (page_type == 'pin')
     {
@@ -536,6 +538,11 @@ function fix_pin_layout()
 
 function fix_user_images()
 {
+    // Get rid of evil manual image sizing
+    var containers = document.querySelectorAll('.heightContainer');
+    for (var i = 0; i < containers.length; i++)
+	containers[i].style = "";
+
     var imgs = document.querySelectorAll('img[data-src]');
     for (var i = 0; i < imgs.length; i++)
     {
