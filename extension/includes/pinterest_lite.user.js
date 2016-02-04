@@ -31,6 +31,7 @@ if (is_prefix("/explore/", window.location.pathname))
 
 console.log('page type: ' + page_type);
 
+var main_pin;  // Only exists for (some) pin pages
 
 /********************************************************************************/
 
@@ -413,7 +414,6 @@ function layout_items_float(columns, container_selector)
 // float related pins around main pin
 function layout_items_float_pin(columns, container_selector)
 {
-    var mainpin = document.querySelector('.activeItem');
     var containers = document.querySelectorAll(container_selector);
     for (var j = 0; j < containers.length; j++)
     {
@@ -422,7 +422,7 @@ function layout_items_float_pin(columns, container_selector)
 	var k = 0;
 	for (var i = 0; i < items.length; i++)
 	{
-	    if (items[i].offsetTop + items[i].clientHeight > mainpin.clientHeight) // below main pin ?
+	    if (items[i].offsetTop + items[i].clientHeight > main_pin.clientHeight) // below main pin ?
 		if (k++ % columns == 0)
 	        {
 		    var div = document.createElement('div');
@@ -450,9 +450,9 @@ function layout()
     if (layout_type == 'float')
 	removeall(document.querySelectorAll('div.clearfloats'));
 
-//    if (page_type == 'pin')
-//	layout_items_float_pin(columns, '.GridItems.variableHeightLayout');
-//    else
+    if (page_type == 'pin' && main_pin)
+	layout_items_float_pin(columns, '.GridItems.variableHeightLayout');
+    else
 	layout_functions[layout_type](columns, '.GridItems.variableHeightLayout');
 }
 
@@ -481,6 +481,13 @@ function add_styles()
     if (page_type == 'pin')
     {
 	add_style(".Board.boardPinsGrid .pinGridWrapper .item { opacity: 1; } "); // remove pin icons greyout
+
+	// .mainPin style page
+	add_style(".mainPin { float: left; }");
+	add_style(".PinCommentsPage { display: none; }"); 
+	add_style(".mainPin .Image > .heightContainer { max-height: inherit; }");
+
+	// .activeItem style page
 	add_style(".activeItem { float: left; }");
     }
 
@@ -510,6 +517,7 @@ function remove_unwanted_stuff()
     removeall(document.querySelectorAll(".bulkEditPinWrapper"));
     removeall(document.querySelectorAll(".sharedContentPosting"));
     removeall(document.querySelectorAll(".item meta"));
+    removeall(document.querySelectorAll(".PinCommentsPage"));
 
     // remove titles
     var links = document.querySelectorAll('.GridItems.variableHeightLayout .item .pinHolder > a');
@@ -522,14 +530,32 @@ function fix_pin_layout()
     if (page_type != "pin")
 	return;
 
-    var header = document.querySelector(".pinPageHeader");
-    header.parentNode.removeChild(header);  // remove page header
+    if (main_pin)
+    {
+	var grid = document.querySelector(".GridItems");
+	// put main pin in the grid so we can float things around
+	grid.insertBefore(main_pin, grid.firstChild);
+	
+	var title = document.querySelector(".relatedPinsTitle");
+	title.parentNode.removeChild(title);  // remove title
 
-    // Link to full size image in main pin
-    var link = document.querySelector(".activeItem .pinHolder a");
-    var img = document.querySelector(".activeItem .pinHolder a img");
-    // link.href = img.src.replace("236x", "564x");
-    link.href = img.src.replace("236x", "originals");
+	// Link to full size image in main pin
+	var link = document.querySelector(".mainPin a.paddedPinLink");
+	var img = document.querySelector( ".mainPin a.paddedPinLink img");
+	// link.href = img.src.replace("236x", "564x");
+	link.href = img.src.replace("236x", "originals");
+    }
+    else
+    {
+	var header = document.querySelector(".pinPageHeader");
+	header.parentNode.removeChild(header);  // remove page header
+
+	// Link to full size image in main pin
+	var link = document.querySelector(".activeItem .pinHolder a");
+	var img = document.querySelector(".activeItem .pinHolder a img");
+	// link.href = img.src.replace("236x", "564x");
+	link.href = img.src.replace("236x", "originals");
+    }
 }
 
 function fix_user_images()
@@ -551,17 +577,18 @@ function main()
 {
     console.log('in main()');
 
+    main_pin = document.querySelector('.mainPin');
     document.removeEventListener('DOMContentLoaded', main, false);  // call only once, please
     window.onresize = layout;
     init_xhr_req_data();
     remove_unwanted_stuff();
     fix_pin_layout();
+    fix_user_images();
     layout();
     if (layout_type == 'tile')
 	add_style(".GridItems.variableHeightLayout > .item \
                       { visibility:visible; } ");
     
-    fix_user_images();
     autoload_init(null);
 }
 
