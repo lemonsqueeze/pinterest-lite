@@ -419,8 +419,7 @@ function layout_items_float(columns, container_selector)
 // float related pins around main pin
 function layout_items_float_pin(columns, container_selector)
 {
-return;
-    var mainpin = document.querySelector('.mainPin');
+    var mainpin = document.querySelector('.activeItem');
     var containers = document.querySelectorAll(container_selector);
     for (var j = 0; j < containers.length; j++)
     {
@@ -484,7 +483,7 @@ function add_styles()
     if (page_type == 'pin')
     {
 	add_style(".Board.boardPinsGrid .pinGridWrapper .item { opacity: 1; } "); // remove pin icons greyout
-	add_style(".mainPin { float: left; }");
+	add_style(".activeItem { float: left; }");
     }
 
     // FIXME keep in sync with layout() removeall()'s
@@ -525,14 +524,8 @@ function fix_pin_layout()
     if (page_type != "pin")
 	return;
 
-//    var pin = document.querySelector(".mainPin");
-//    var grid = document.querySelector(".GridItems");
-    // put main pin in the grid so we can float things around
-//    grid.insertBefore(pin, grid.firstChild);
-
-//    var title = document.querySelector(".relatedPinsTitle");
-//    title.parentNode.removeChild(title);  // remove title
-
+    var header = document.querySelector(".pinPageHeader");
+    header.parentNode.removeChild(header);  // remove page header
 
     // Link to full size image in main pin
     var link = document.querySelector(".activeItem .pinHolder a");
