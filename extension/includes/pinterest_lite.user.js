@@ -26,6 +26,9 @@ if (is_prefix("/pin/", window.location.pathname))
     page_type = "pin";
 if (is_prefix("/source/", window.location.pathname))
     page_type = "source";
+if (is_prefix("/explore/", window.location.pathname))
+    page_type = "search";
+
 console.log('page type: ' + page_type);
 
 
@@ -33,10 +36,9 @@ console.log('page type: ' + page_type);
 
 var board_url = window.location.pathname;
 var xhr_req_data = null;
+var autoload_container = "";
 
-/* Pin page requests */
-
-function make_relatedpinfeedresource_url(data)
+function make_feedresource_url(data, query_type)
 {
     var s = JSON.stringify(data);
     s = encodeURI(s);
@@ -45,49 +47,59 @@ function make_relatedpinfeedresource_url(data)
     s = s.replace(/\//g, '%2F');
     s = s.replace(/=/g, '%3D');
 
-    var url = ("https://www.pinterest.com/resource/RelatedPinFeedResource/get/" +
+    var url = ("https://www.pinterest.com/resource/" + query_type + "/get/" +
 	       "?source_url=" + board_url.replace(/\//g, '%2F') +
 	       "&data=" + s +
 	       "&_=" + new Date().getTime());
     return url;
 }
 
-function get_relatedpinfeedresource_url(o)
+/* Search page requests */
+
+function get_searchfeedresource_url(o)
 {
-    if (!o)
-	return make_relatedpinfeedresource_url(xhr_req_data);
-    return null;
-}
-
-/* Board page requests */
-
-function make_boardfeedresource_url(data)
-{
-    var s = JSON.stringify(data);
-    s = encodeURI(s);
-    s = s.replace(/:/g, '%3A');
-    s = s.replace(/,/g, '%2C');
-    s = s.replace(/\//g, '%2F');
-    s = s.replace(/=/g, '%3D');
-
-    var url = ("https://www.pinterest.com/resource/BoardFeedResource/get/" +
-	       "?source_url=" + board_url.replace(/\//g, '%2F') +
-	       "&data=" + s +
-	       "&_=" + new Date().getTime());
-    return url;
-}
-
-
-function get_boardfeedresource_url(o)
-{
-    if (!o)  // first time
-	return make_boardfeedresource_url(xhr_req_data);
+    if (!o) { // first time
+	autoload_container = '.GridItems';
+	return make_feedresource_url(xhr_req_data, "BaseSearchResource");    
+    }
     
     var bookmark = o.resource.options.bookmarks[0];
     if (bookmark == "-end-")
 	return null;
     xhr_req_data.options.bookmarks[0] = bookmark;
-    return make_boardfeedresource_url(xhr_req_data);
+    return make_feedresource_url(xhr_req_data, "BaseSearchResource");
+}
+
+/* Pin page requests */
+
+function get_relatedpinfeedresource_url(o)
+{
+    if (!o) {
+	autoload_container = '.GridItems';
+	return make_feedresource_url(xhr_req_data, "RelatedPinFeedResource");
+    }
+    
+    var bookmark = o.resource.options.bookmarks[0];
+    if (bookmark == "-end-")
+	return null;
+    xhr_req_data.options.bookmarks[0] = bookmark;
+    return make_feedresource_url(xhr_req_data, "RelatedPinFeedResource");
+}
+
+/* Board page requests */
+
+function get_boardfeedresource_url(o)
+{
+    if (!o)  { // first time
+	autoload_container = '.GridItems';
+	return make_feedresource_url(xhr_req_data, "BoardFeedResource");
+    }
+    
+    var bookmark = o.resource.options.bookmarks[0];
+    if (bookmark == "-end-")
+	return null;
+    xhr_req_data.options.bookmarks[0] = bookmark;
+    return make_feedresource_url(xhr_req_data, "BoardFeedResource");
 }
 
 function init_xhr_req_data()
@@ -97,8 +109,10 @@ function init_xhr_req_data()
     
     if (page_type == 'board')
 	m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);    
-    if (page_type == 'pin')
+    if (page_type == 'pin') 
 	m = script.innerText.match(/"RelatedPinFeedResource", ([^}]*}[^}]*})/);
+    if (page_type == 'search')
+	m = script.innerText.match(/"BaseSearchResource", ([^}]*})/);
     if (!m)
 	return;
     
@@ -117,6 +131,8 @@ function get_xhr_url(o)
 	return get_boardfeedresource_url(o);
     if (page_type == 'pin')
 	return get_relatedpinfeedresource_url(o);
+    if (page_type == 'search')
+	return get_searchfeedresource_url(o);
     return null;
 }
 
@@ -235,47 +251,26 @@ function new_item(item)
 
 function process_autoload_results(res)
 {
-    if (page_type == 'board')
-	process_board_feed_results(res);
-    if (page_type == 'pin')
-	process_related_pin_feed_results(res);
-}
-
-function process_related_pin_feed_results(res)
-{
     // console.log("xhr worked !");
     
     var o = JSON.parse(res);
     // window.obj_response = o; // FIXME debugging
     var fragment = document.createDocumentFragment();
-    for (var i in o.resource_response.data)
-    {
-	var item = o.resource_response.data[i];
-	fragment.appendChild(new_item(item));  // FIXME template for pin items is different !
-    }
-    var parent = document.querySelector('.rightSection .GridItems.variableHeightLayout'); // board page
-    parent.appendChild(fragment);
 
-    document.body.columns_items = 0; // force
-    layout();
+    if (page_type == 'search')
+	for (var i in o.resource_response.data.results)
+        {
+	    var item = o.resource_response.data.results[i];
+	    fragment.appendChild(new_item(item));
+	}
+    else
+	for (var i in o.resource_response.data)
+        {
+	    var item = o.resource_response.data[i];
+	    fragment.appendChild(new_item(item));
+	}
 
-    autoload.requestingMoreResults = false;
-    autoload_init(o);
-}
-
-function process_board_feed_results(res)
-{
-    // console.log("xhr worked !");
-    
-    var o = JSON.parse(res);
-    // window.obj_response = o; // FIXME debugging
-    var fragment = document.createDocumentFragment();
-    for (var i in o.resource_response.data)
-    {
-	var item = o.resource_response.data[i];
-	fragment.appendChild(new_item(item));
-    }
-    var parent = document.querySelector('.locationBoardPageContentWrapper .GridItems.variableHeightLayout'); // board page
+    var parent = document.querySelector(autoload_container);
     parent.appendChild(fragment);
 
     document.body.columns_items = 0; // force
