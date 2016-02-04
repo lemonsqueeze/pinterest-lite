@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" version="1.164"
+<widget xmlns="http://www.w3.org/ns/widgets" version="1.166"
 	id="https://github.com/lemonsqueeze/pinterest_lite">
     <name>Pinterest Lite</name>
     <description>Browse Pinterest without login and all the bloat.</description>

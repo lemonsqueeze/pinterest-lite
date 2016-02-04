@@ -456,9 +456,9 @@ function layout()
     if (layout_type == 'float')
 	removeall(document.querySelectorAll('div.clearfloats'));
 
-    if (page_type == 'pin')
-	layout_items_float_pin(columns, '.GridItems.variableHeightLayout');
-    else
+//    if (page_type == 'pin')
+//	layout_items_float_pin(columns, '.GridItems.variableHeightLayout');
+//    else
 	layout_functions[layout_type](columns, '.GridItems.variableHeightLayout');
 }
 
