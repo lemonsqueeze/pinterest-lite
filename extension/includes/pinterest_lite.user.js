@@ -26,7 +26,8 @@ if (is_prefix("/pin/", window.location.pathname))
     page_type = "pin";
 if (is_prefix("/source/", window.location.pathname))
     page_type = "source";
-if (is_prefix("/explore/", window.location.pathname))
+if (is_prefix("/explore/", window.location.pathname) || 
+    is_prefix("/search/", window.location.pathname))
     page_type = "search";
 
 console.log('page type: ' + page_type);
@@ -61,14 +62,14 @@ function get_searchfeedresource_url(o)
 {
     if (!o) { // first time
 	autoload_container = '.GridItems';
-	return make_feedresource_url(xhr_req_data, "BaseSearchResource");    
+	return make_feedresource_url(xhr_req_data, "InterestsFeedResource");    
     }
     
     var bookmark = o.resource.options.bookmarks[0];
     if (bookmark == "-end-")
 	return null;
     xhr_req_data.options.bookmarks[0] = bookmark;
-    return make_feedresource_url(xhr_req_data, "BaseSearchResource");
+    return make_feedresource_url(xhr_req_data, "InterestsFeedResource");
 }
 
 /* Pin page requests */
@@ -77,14 +78,14 @@ function get_relatedpinfeedresource_url(o)
 {
     if (!o) {
 	autoload_container = '.GridItems';
-	return make_feedresource_url(xhr_req_data, "RelatedPinFeedResource");
+	return make_feedresource_url(xhr_req_data, "OriginalPinAndRelatedPinFeedResource");
     }
     
     var bookmark = o.resource.options.bookmarks[0];
     if (bookmark == "-end-")
 	return null;
     xhr_req_data.options.bookmarks[0] = bookmark;
-    return make_feedresource_url(xhr_req_data, "RelatedPinFeedResource");
+    return make_feedresource_url(xhr_req_data, "OriginalPinAndRelatedPinFeedResource");
 }
 
 /* Board page requests */
@@ -106,14 +107,16 @@ function get_boardfeedresource_url(o)
 function init_xhr_req_data()
 {
     var script = document.querySelector('script#jsInit');
+    if (!script)
+	script = document.querySelector('script#jsInit1');
     var m = null;
     
     if (page_type == 'board')
 	m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);    
     if (page_type == 'pin') 
-	m = script.innerText.match(/"RelatedPinFeedResource", ([^}]*}[^}]*})/);
+	m = script.innerText.match(/"OriginalPinAndRelatedPinFeedResource", ([^}]*}[^}]*})/);
     if (page_type == 'search')
-	m = script.innerText.match(/"BaseSearchResource", ([^}]*})/);
+	m = script.innerText.match(/"InterestsFeedResource", ([^}]*})/);
     if (!m)
 	return;
     
@@ -122,6 +125,7 @@ function init_xhr_req_data()
     catch (err)
     { xhr_req_data = JSON.parse('{' + m[1] );  }
     xhr_req_data.context = {};
+    console.log("xhr_req_data init ok");
 }
 
 function get_xhr_url(o)
@@ -150,6 +154,7 @@ function autoload_init(o)
     
     // TODO spinner ?
     watch_for_scroll();
+    console.log("autoload_init ok");
 }
 
 function request_more_results()
@@ -251,25 +256,18 @@ function new_item(item)
 
 function process_autoload_results(res)
 {
-    // console.log("xhr worked !");
+    console.log("xhr worked !");
     
     var o = JSON.parse(res);
-    // window.obj_response = o; // FIXME debugging
+    // window.obj_response = o; //  debugging
     var fragment = document.createDocumentFragment();
 
-    if (page_type == 'search')
-	for (var i in o.resource_response.data.results)
-        {
-	    var item = o.resource_response.data.results[i];
-	    fragment.appendChild(new_item(item));
-	}
-    else
-	for (var i in o.resource_response.data)
-        {
-	    var item = o.resource_response.data[i];
-	    fragment.appendChild(new_item(item));
-	}
-
+    for (var i in o.resource_response.data)
+    {
+	var item = o.resource_response.data[i];
+	fragment.appendChild(new_item(item));
+    }
+    
     var parent = document.querySelector(autoload_container);
     parent.appendChild(fragment);
 
