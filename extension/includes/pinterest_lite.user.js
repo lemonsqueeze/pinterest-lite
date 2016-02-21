@@ -506,6 +506,7 @@ function remove_unwanted_stuff()
 {
     removeall(document.querySelectorAll("script"));
     removeall(document.querySelectorAll(".pinMeta"));
+    removeall(document.querySelectorAll(".pinMetaWrapper"));
     removeall(document.querySelectorAll(".pinImageDim"));
     removeall(document.querySelectorAll(".repinSendButtonWrapper"));
     removeall(document.querySelectorAll(".likeEditButtonWrapper"));
