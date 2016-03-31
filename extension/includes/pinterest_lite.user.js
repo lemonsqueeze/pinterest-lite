@@ -81,18 +81,18 @@ function init_xhr_req_data()
     
     if (page_type == 'board') {
 	resource_type =             "BoardFeedResource";
-	m = script.innerText.match(/"BoardFeedResource", ([^}]*})/);    
+	m = script.innerText.match(/"BoardFeedResource",(.*?"bookmarks"[^}]*})/);    
     }
     if (page_type == 'pin') {
 	resource_type =             "OriginalPinAndRelatedPinFeedResource";
-	m = script.innerText.match(/"OriginalPinAndRelatedPinFeedResource", ([^}]*}[^}]*})/);
+	m = script.innerText.match(/"OriginalPinAndRelatedPinFeedResource",(.*?"bookmarks"[^}]*})/);
     }	
     if (page_type == 'search') {
 	resource_type =             "InterestsFeedResource";
-	m = script.innerText.match(/"InterestsFeedResource", ([^}]*})/);
+	m = script.innerText.match(/"InterestsFeedResource",(.*?"bookmarks"[^}]*})/);
 	if (!m) {
 	    resource_type =             "BaseSearchResource";
-	    m = script.innerText.match(/"BaseSearchResource", ([^}]*})/);
+	    m = script.innerText.match(/"BaseSearchResource",(.*?"bookmarks"[^}]*})/);
 	}
     }
     if (!m)
