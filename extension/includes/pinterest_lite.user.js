@@ -42,6 +42,13 @@ var autoload_container = "";
 
 function make_feedresource_url(data, query_type)
 {
+    if (resource_type == 'RelatedPinFeedResource')
+    {
+	var o = data.options;
+	data.options = {"pin":o.pin, "is_csr":null, "show_seo_canonical_pins":null, 
+			"search_query":null, "bookmarks":o.bookmarks};	
+    }
+
     var s = JSON.stringify(data);
     s = encodeURI(s);
     s = s.replace(/:/g, '%3A');
@@ -84,7 +91,7 @@ function init_xhr_req_data()
 	m = script.innerText.match(/"BoardFeedResource",(.*?"bookmarks"[^}]*})/);    
     }
     if (page_type == 'pin') {
-	resource_type =             "OriginalPinAndRelatedPinFeedResource";
+	resource_type =             "RelatedPinFeedResource";
 	m = script.innerText.match(/"OriginalPinAndRelatedPinFeedResource",(.*?"bookmarks"[^}]*})/);
     }	
     if (page_type == 'search') {
@@ -136,6 +143,7 @@ function autoload_init(o)
 function request_more_results()
 {    
     console.log("getting more items ...");
+    window.xhr_url = xhr_url;
 //    console.log(xhr_url);
     getURL(xhr_url, process_autoload_results, autoload_error);
 }
