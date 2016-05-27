@@ -538,13 +538,13 @@ function fix_pin_layout()
     else
     {
 	var header = document.querySelector(".pinPageHeader");
-	header.parentNode.removeChild(header);  // remove page header
+	if (header)	header.parentNode.removeChild(header);  // remove page header
 
 	// Link to full size image in main pin
-	var link = document.querySelector(".activeItem .pinHolder a");
-	var img = document.querySelector(".activeItem .pinHolder a img");
+	var link = document.querySelector(".GridItems .item:first-child .pinHolder a");
+	var img = document.querySelector(".GridItems .item:first-child .pinHolder a img");
 	// link.href = img.src.replace("236x", "564x");
-	link.href = img.src.replace("236x", "originals");
+	link.href = img.src.replace("/736x/", "/originals/");
     }
 }
 
