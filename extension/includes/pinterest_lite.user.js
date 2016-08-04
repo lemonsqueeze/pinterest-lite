@@ -81,6 +81,8 @@ function get_feedresource_url(o)
 
 function init_xhr_req_data()
 {
+    return;
+    
     var script = document.querySelector('script#jsInit');
     if (!script)
 	script = document.querySelector('script#jsInit1');
@@ -91,8 +93,8 @@ function init_xhr_req_data()
 	m = script.innerText.match(/"BoardFeedResource",(.*?"bookmarks"[^}]*})/);    
     }
     if (page_type == 'pin') {
-	resource_type =             "RelatedPinFeedResource";
-	m = script.innerText.match(/"OriginalPinAndRelatedPinFeedResource",(.*?"bookmarks"[^}]*})/);
+	resource_type =             "ReactPinFeedResource";
+	m = script.innerText.match(/"ReactPinFeedResource",.*?"bookmarks": "([^"]*)"/);
     }	
     if (page_type == 'search') {
 	resource_type =             "InterestsFeedResource";
@@ -381,23 +383,18 @@ function removeall(l)
 	l[i].parentNode.removeChild(l[i]);
 }
 
-function layout_items_float(columns, container_selector)
+function layout_items_float(columns, container)
 {
-    var containers = document.querySelectorAll(container_selector);
-    for (var j = 0; j < containers.length; j++)
+    var items = container.querySelectorAll('div.static');
+    for (var i = 0; i < items.length; i++)
     {
-	var container = containers[j];
-	var items = container.querySelectorAll('div.item');
-	for (var i = 0; i < items.length; i++)
+	if (i && i % columns == 0)
 	{
-	    if (i && i % columns == 0)
-	    {
-		var div = document.createElement('div');
-		div.className = 'clearfloats';
-		container.insertBefore(div, items[i]);
-	    }
-	}   
-    }        
+	    var div = document.createElement('div');
+	    div.className = 'clearfloats';
+	    container.insertBefore(div, items[i]);
+	}
+    }   
 }
 
 // float related pins around main pin
@@ -439,19 +436,21 @@ function layout()
     if (layout_type == 'float')
 	removeall(document.querySelectorAll('div.clearfloats'));
 
+    var container = document.querySelector(".static").parentNode;
+
     if (page_type == 'pin' && main_pin)
 	layout_items_float_pin(columns, '.GridItems.variableHeightLayout');
     else
-	layout_functions[layout_type](columns, '.GridItems.variableHeightLayout');
+	layout_functions[layout_type](columns, container);
 }
 
 function add_styles()
 {
     if (layout_type == 'float' || layout_type == 'table')
     {
-	add_style(".GridItems.variableHeightLayout > .item \
-                      { float:left; position:static; visibility:visible; } ");
-	add_style(".GridItems.variableHeightLayout > .clearfloats  { clear: both; } ");
+	add_style(".gridCentered .static { float:left; position:static; visibility:visible; " + 
+		  "                        margin:7px 7px; } ");
+	add_style(".clearfloats  { clear: both; } ");
     }
 
     if (layout_type == 'table')
@@ -460,12 +459,13 @@ function add_styles()
 	add_style(".items_table_layout      { border-spacing:0px; } ");
     }
 
-    add_style(".Pin.summary .pinImg   { opacity: 1; } ");		// make board images visible
-    add_style(".creditImg.user img    { position: static; } ");		// fix user images
+    //add_style(".Pin.summary .pinImg   { opacity: 1; } ");		// make board images visible
+    //add_style(".creditImg.user img    { position: static; } ");		// fix user images
     // Get rid of evil manual image sizing
-    add_style(".Image > .heightContainer > img { position: static;  } ");
+    add_style(".GrowthSEOPinImage > a > img { position: static;  } ");
     // Truncate giant images ...
-    add_style(".Image > .heightContainer { max-height: 450px; overflow: hidden; } ");
+    add_style(".GrowthSEOPinImage > a { max-height: 450px; overflow: hidden; } ");
+    return;
     
     if (page_type == 'pin')
     {
@@ -495,22 +495,28 @@ function add_styles()
 
 function remove_unwanted_stuff()
 {
-    removeall(document.querySelectorAll("script"));
-    removeall(document.querySelectorAll(".pinMeta"));
-    removeall(document.querySelectorAll(".pinMetaWrapper"));
-    removeall(document.querySelectorAll(".pinImageDim"));
-    removeall(document.querySelectorAll(".repinSendButtonWrapper"));
-    removeall(document.querySelectorAll(".likeEditButtonWrapper"));
-    removeall(document.querySelectorAll(".Pin.summary .pinImageActionButtonWrapper a.pinNavLink"));
-    removeall(document.querySelectorAll(".pinDomain"));
+    removeall(document.querySelectorAll(".GrowthSEOPinImage + div"));
+    removeall(document.querySelectorAll(".GrowthSEOPinImage > button"));
+    removeall(document.querySelectorAll(".GrowthSEOPinImage__contentLink"));
+    removeall(document.querySelectorAll(".GrowthSEOPinImage__imageDim"));
+    removeall(document.querySelectorAll(".GrowthSEOPinImage > a > h4"));
 
-    removeall(document.querySelectorAll(".bulkEditPinWrapper"));
-    removeall(document.querySelectorAll(".sharedContentPosting"));
-    removeall(document.querySelectorAll(".item meta"));
-    removeall(document.querySelectorAll(".PinCommentsPage"));
+    //removeall(document.querySelectorAll("script"));
+    //removeall(document.querySelectorAll(".pinMeta"));
+    //removeall(document.querySelectorAll(".pinMetaWrapper"));
+    //removeall(document.querySelectorAll(".pinImageDim"));
+    //removeall(document.querySelectorAll(".repinSendButtonWrapper"));
+    //removeall(document.querySelectorAll(".likeEditButtonWrapper"));
+    //removeall(document.querySelectorAll(".Pin.summary .pinImageActionButtonWrapper a.pinNavLink"));
+    //removeall(document.querySelectorAll(".pinDomain"));
 
-    // remove titles
-    var links = document.querySelectorAll('.GridItems.variableHeightLayout .item .pinHolder > a');
+    //removeall(document.querySelectorAll(".bulkEditPinWrapper"));
+    //removeall(document.querySelectorAll(".sharedContentPosting"));
+    //removeall(document.querySelectorAll(".item meta"));
+    //removeall(document.querySelectorAll(".PinCommentsPage"));
+
+    // remove image titles tooltips
+    var links = document.querySelectorAll('.GrowthSEOPinImage > a');
     for (var i = 0; i < links.length; i++)
 	links[i].title = "";
 }
@@ -541,8 +547,8 @@ function fix_pin_layout()
 	if (header)	header.parentNode.removeChild(header);  // remove page header
 
 	// Link to full size image in main pin
-	var link = document.querySelector(".GridItems .item:first-child .pinHolder a");
-	var img = document.querySelector(".GridItems .item:first-child .pinHolder a img");
+	var link = document.querySelector(".static:first-child .GrowthSEOPinImage a");
+	var img =  document.querySelector(".static:first-child .GrowthSEOPinImage a img");
 	// link.href = img.src.replace("236x", "564x");
 	link.href = img.src.replace("/736x/", "/originals/");
     }
