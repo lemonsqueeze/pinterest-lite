@@ -216,7 +216,7 @@ function new_item(item)
     var item_template =  [
 '<div class="static" >',
 '  <div data-test-pin="true" style="background:white;border-radius:6px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.22);display:inline-block;backface-visibility:hidden;font-size:11px;position:relative;width:236px;" >',
-'    <div class="GrowthSEOPinImage" style="position:relative;" >',
+'    <div class="GrowthUnauthPinImage" style="position:relative;" >',
 '      <a href="/pin/' + item.id + '/?from_navigate=true" style="border-radius:6px 6px 0 0; " target="_blank" title="" >',
 '        <img src="' + item.images['236x'].url + '" style="border-radius:inherit; width:236px;" >',
 '      </a>',
@@ -500,9 +500,9 @@ function add_styles()
     //add_style(".Pin.summary .pinImg   { opacity: 1; } ");		// make board images visible
     //add_style(".creditImg.user img    { position: static; } ");		// fix user images
     // Get rid of evil manual image sizing
-    add_style(".GrowthSEOPinImage > a > img { position: static;  } ");
+    add_style(".GrowthUnauthPinImage > a > img { position: static;  } ");
     // Truncate giant images ...
-    add_style(".GrowthSEOPinImage > a { display:inline-block; max-height: 450px; overflow: hidden; } ");
+    add_style(".GrowthUnauthPinImage > a { display:inline-block; max-height: 450px; overflow: hidden; } ");
     return;
     
     if (page_type == 'pin')
@@ -535,21 +535,21 @@ function remove_unwanted_stuff()
 {
     // cursor:zoom-in;border-radius:6px 6px 0 0; display:block; padding:0px; font-weight:bold;
     // text-decoration:none; color:#717171; overflow:hidden; background:#504332; max-height:800px;
-    remove_elements_style(document.querySelectorAll(".GrowthSEOPinImage > a"));
-    add_style(".GrowthSEOPinImage > a    { border-radius:6px 6px 0 0; }");
+    remove_elements_style(document.querySelectorAll(".GrowthUnauthPinImage > a"));
+    add_style(".GrowthUnauthPinImage > a    { border-radius:6px 6px 0 0; }");
 
     // -webkit-transition:opacity 0.04s linear;transition:opacity 0.04s linear;border-radius:inherit;
     // opacity:1; display:block; margin:0 auto;border:0px;width:100%;max-width:100%;vertical-align:middle;
     // position:relative;height:925.4901960784314px;
-    remove_elements_style(document.querySelectorAll(".GrowthSEOPinImage > a > img"));
-    add_style(".GrowthSEOPinImage > a > img   {  border-radius:inherit; width:236px; }");
+    remove_elements_style(document.querySelectorAll(".GrowthUnauthPinImage > a > img"));
+    add_style(".GrowthUnauthPinImage > a > img   {  border-radius:inherit; width:236px; }");
     
 
-    removeall(document.querySelectorAll(".GrowthSEOPinImage + div"));
-    removeall(document.querySelectorAll(".GrowthSEOPinImage > button"));
-    removeall(document.querySelectorAll(".GrowthSEOPinImage__contentLink"));
-    removeall(document.querySelectorAll(".GrowthSEOPinImage__imageDim"));
-    removeall(document.querySelectorAll(".GrowthSEOPinImage > a > h4"));
+    removeall(document.querySelectorAll(".GrowthUnauthPinImage + div"));
+    removeall(document.querySelectorAll(".GrowthUnauthPinImage > button"));
+    removeall(document.querySelectorAll(".GrowthUnauthPinImage__contentLink"));
+    removeall(document.querySelectorAll(".GrowthUnauthPinImage__imageDim"));
+    removeall(document.querySelectorAll(".GrowthUnauthPinImage > a > h4"));
 
     //removeall(document.querySelectorAll("script"));
     //removeall(document.querySelectorAll(".pinMeta"));
@@ -566,7 +566,7 @@ function remove_unwanted_stuff()
     //removeall(document.querySelectorAll(".PinCommentsPage"));
 
     // remove image titles tooltips
-    var links = document.querySelectorAll('.GrowthSEOPinImage > a');
+    var links = document.querySelectorAll('.GrowthUnauthPinImage > a');
     for (var i = 0; i < links.length; i++)
 	links[i].title = "";
 }
@@ -583,8 +583,11 @@ function fix_pin_layout()
     // just remove width=236px
     main_pin.style = ("background:white;border-radius:6px;box-shadow:0 1px 2px 0 rgba(0,0,0,0.22);" +
 		      "display:inline-block;backface-visibility:hidden;font-size:11px;position:relative;");
-    document.querySelector(".static .GrowthSEOPinImage a").style = "max-height:100%";
-    document.querySelector(".static .GrowthSEOPinImage a img").style = "width:100%";
+    document.querySelector(".static .GrowthUnauthPinImage a").style = "max-height:100%";
+    document.querySelector(".static .GrowthUnauthPinImage a img").style = "width:100%";
+    //   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#555;font-weight:bold;font-size:11px;
+    document.querySelector(".static h4").style = "max-width:300px;" +
+	"white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#555;font-weight:bold;font-size:11px;";
 
 
     // Remove cookie bar
@@ -601,9 +604,10 @@ function fix_pin_layout()
 
     
     // Link to full size image in main pin
-    var link = document.querySelector(".static:first-child .GrowthSEOPinImage a");
-    var img =  document.querySelector(".static:first-child .GrowthSEOPinImage a img");
-    link.href = img.src.replace("/736x/", "/originals/");
+    var link = document.querySelector(".static:first-child .GrowthUnauthPinImage a");
+    var img =  document.querySelector(".static:first-child .GrowthUnauthPinImage a img");
+    //link.href = img.src.replace("/736x/", "/originals/");
+    link.href = img.src.replace("/564x/", "/originals/");
 }
 
 function fix_user_images()
