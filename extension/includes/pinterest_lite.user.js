@@ -3,8 +3,10 @@
 // @namespace   https://github.com/lemonsqueeze/pinterest_lite
 // @version     1.0
 // @description Browse Pinterest without all the javascript bloat
-// @include     http://www.pinterest.com/pin/*
-// @include     https://www.pinterest.com/pin/*
+// @include     http://www.pinterest.com/*
+// @include     https://www.pinterest.com/*
+// @exclude     http://www.pinterest.com/search/*
+// @exclude     https://www.pinterest.com/search/*
 // @copyright   2015, lemonsqueeze
 // @license     GPL version 3 or any later version; http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
@@ -87,13 +89,26 @@ function init_xhr_req_data()
     
     if (page_type == 'board') {
 	resource_type =             "BoardFeedResource";
-	m = script.innerText.match(/"BoardFeedResource",(.*?"bookmarks"[^}]*})/);    
+	bookmark = script.innerText.match(/"bookmarks": "([^"]*)"/)[1];
+	var board_id = script.innerText.match(/"board_id": "([^"]*)"/)[1];
+
+	xhr_req_data = {
+	    options: {
+		board_id: board_id,
+		page_size: 25,
+		add_vase: true,
+		bookmarks: [ bookmark ],
+		field_set_key: "unauth_react",
+		show_rich_snippet: true
+	    },
+	    context: {}
+	};
     }
     if (page_type == 'pin') {
 	resource_type =             "RelatedPinFeedResource";
 	bookmark = script.innerText.match(/"bookmarks": "([^"]*)"/)[1];
-
 	var pin = window.location.pathname.match(/\/pin\/([0-9]+)/)[1];
+	
 	xhr_req_data = {
 	    options: {
 		pin: pin,
@@ -221,16 +236,22 @@ function new_item(item)
 '        <img src="' + item.images['236x'].url + '" style="border-radius:inherit; width:236px;" >',
 '      </a>',
 '    </div>',
+];
+
+    if (item.board)  item_template = item_template.concat([
 '    <div style="border-top:1px solid rgb(231, 231, 231);border-radius:0 0 6px 6px;position:relative;" >',
 '      <a href="' + item.board.url + '" style="line-height:15px;padding:10px;border-radius:inherit;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:block;" target="_blank" >',
 '        <img class="PinCredit__image" src="' + item.board.image_thumbnail_url + '" style="position:relative;float:left;height:30px;width:30px;margin-right:5px;display:block;border-radius:50%;" >',
 '        <h4 style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#555;font-weight:bold;font-size:11px;" >' + "Owner" + '</h4>',
 '        <p style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#555;font-weight:normal;font-size:11px;margin:0px;" >' + item.board.name + '</p>',
 '      </a>',
-'    </div>',
+'    </div>'
+]);
+
+    item_template = item_template.concat([
 '  </div>',
 '</div>'
-];
+]);
 
 var old_stuff = [
 '<div class="item " >', 
@@ -486,8 +507,8 @@ function add_styles()
 {
     if (layout_type == 'float' || layout_type == 'table')
     {
-	add_style(".gridCentered .static,  .gridCentered .static:nth-child(-n+4)" + 
-		  "       { float:left; position:static; visibility:visible; margin:7px 7px; }");
+	add_style(".gridCentered .static" + 
+		  "       { float:left; display:block; position:static; visibility:visible; margin:7px 7px; }");
 	add_style(".clearfloats  { clear: both; } ");
     }
 
