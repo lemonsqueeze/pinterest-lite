@@ -447,6 +447,9 @@ function layout()
 
 function add_styles()
 {
+    add_style(".Grid .GridItems.centeredWithinWrapper  { width: auto; }");
+    add_style(".Grid .GridItems.padItems.variableHeightLayout > .item  { padding: 12px 7px !important; }");
+
     if (layout_type == 'float' || layout_type == 'table')
     {
 	add_style(".GridItems.variableHeightLayout > .item \
